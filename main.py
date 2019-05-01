@@ -1,3 +1,9 @@
+
+# coding: utf-8
+
+# In[8]:
+
+
 # Decomposes a video into component frames
 # A specific timeframe of the video must be chosen
 # The frames may also be cropped to specification
@@ -37,7 +43,7 @@ else:
     stopFrame = round(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     stopFrame = 10000
     
-##### splitting the frame to extract the actual image of the furnace!
+########### splitting the frame to extract the actual image of the furnace!
 
 print("start")
 
@@ -91,7 +97,11 @@ cap.release()
 cv2.destroyAllWindows()
 print("done")
 
-# splitting the frame to extract the present value parameter!
+
+# In[18]:
+
+
+########### splitting the frame to extract the present value parameter!
 
 print("start")
 
@@ -146,13 +156,25 @@ cap.release()
 cv2.destroyAllWindows()
 print("done")
 
-### splitting the frame to extract all the other parameters... (TO-DO)
 
-# extracting the parameters and filling up the database
+# In[ ]:
+
+
+######### splitting the frame to extract all the other parameters... (TO-DO)
+
+
+# In[31]:
+
+
+######### extracting the parameters and filling up the database
 
 from google.cloud import vision
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = 'Image Treatment-5b3bb079ba4e.json'
+from SciServer import CasJobs, Files, Authentication
 
+casjobs_context='MyDB'
+subject_name="Ali Rachidi"
+    
 class landmarkedimage:
     def __init__(self, presentValue): 
         self.presentValue = presentValue
@@ -188,23 +210,19 @@ for file in files:
     temp = detect_text('data_frames_present_value/' + file + '.jpg')
     print(temp)
     li = landmarkedimage(temp)
+    insert_query = '''INSERT INTO furnaceStateHistory
+                (presentValue)
+                VALUES
+                ({0})'''.format(temp)
+    insert_query = '''insert into furnaceStateImages (image) 
+                SELECT BulkColumn 
+                FROM Openrowset( Bulk 'data_frames/frame1.jpg', Single_Blob) as img'''
+    CasJobs.executeQuery(sql=insert_query, context=casjobs_context)
 
-# populating the image
 
-from SciServer import CasJobs, Files, Authentication
+# In[29]:
 
-def __init__(self,
-                 casjobs_context='MyDB',
-                 subject_name="Ali Rachidi",
-                 table_name="furnaceStateHistory"):
-        
-        self.casjobs_context = casjobs_contextr
-        self.subject_name = subject_name
-        self.table_name = table_name
 
-        self.session_file = ""
-        self.session_desc = ""
-        
-        self.stim_classes = []
+insert_query = '''ALTER DATABASE [MyDB] SET TRUSTWORTHY ON'''
+CasJobs.executeQuery(sql=insert_query, context=casjobs_context)
 
-insert_query = "INSERT INTO furnaceStateHistory"
